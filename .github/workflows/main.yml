@@ -1,4 +1,4 @@
-name: CI
+name: Build and Deploy
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - master
 
 jobs:
-  build:
-    name: Build
+  build_and_deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -16,3 +16,7 @@ jobs:
           node-version: '10.x'
       - run: yarn install
       - run: yarn build
+      - shell: bash
+        run: |
+          git_hash=$(git rev-parse --short "$GITHUB_SHA")
+          npx firebase deploy --token ${{ secrets.FIREBASE_TOKEN }} --only hosting -m "Commit ${git_hash}"
